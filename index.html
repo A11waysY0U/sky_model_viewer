@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sky Mesh Studio</title>
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <span class="logo">Sky Studio</span>
+    <button class="tbtn primary" id="openApkBtn"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg></span><span class="full">导入安装包</span><span class="short">导入</span></button>
+    <div class="sep"></div>
+    <button class="tbtn" id="objBtn" disabled><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg></span><span class="full">导出 OBJ</span><span class="short">OBJ</span></button>
+    <button class="tbtn" id="glbBtn" disabled><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg></span><span class="full">导出 GLB</span><span class="short">GLB</span></button>
+    <div class="sep"></div>
+    <button class="tbtn" id="dressBtn" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a2 2 0 0 0-2 2c0 .8.5 1.5 1 2L5 11v3h3v6h8v-6h3v-3l-6-4c.5-.5 1-1.2 1-2a2 2 0 0 0-2-2z"/></svg></span><span class="full">衣柜</span><span class="short">衣柜</span></button>
+    <button class="tbtn" id="mapBtn" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><span class="full">地图</span><span class="short">地图</span></button>
+    <div class="spacer"></div>
+    <input type="file" id="apkInput" accept=".apk,.zip,.xapk,.apks,.ipa">
+  </header>
+  <div id="main">
+    <div id="sidebar">
+      <div class="sbhead"><span id="sbtitle">模型列表</span><span class="spacer"></span><span id="count">未导入</span></div>
+      <div id="search"><input type="text" id="searchInput" placeholder="🔍 搜索模型名..."></div>
+      <div id="list"></div>
+      <div id="dressPanel" style="display:none"></div>
+    </div>
+    <div id="handle" title="折叠/展开侧栏">‹</div>
+    <div id="viewport">
+      <div id="hint">点击「导入安装包」选择 Sky 的安卓 APK 或 iOS IPA<br>自动解析其中的全部 .mesh 模型</div>
+      <div id="info" style="display:none"></div>
+      <div id="infoToggle" title="信息卡">ⓘ</div>
+      <div id="viewcube">
+        <div class="vc" data-view="front">前</div>
+        <div class="vc" data-view="top">顶</div>
+        <div class="vc" data-view="side">侧</div>
+        <div class="vc wide" data-view="reset">复位视角</div>
+      </div>
+      <div id="vtools">
+        <button class="vtb" id="wireBtn" title="线框"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></button>
+        <button class="vtb" id="gridBtn" title="网格"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
+        <button class="vtb" id="dyeBtn" title="上色（默认白模，点击上色上贴图）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.4c2.8 0 5.1-2.3 5.1-5.1C22 6.3 17.5 2 12 2z"/></svg></button>
+        <button class="vtb" id="panBtn" title="平移视角（上下左右移动画面）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><path d="m8 6 4-4 4 4M8 18l4 4 4-4M6 8l-4 4 4 4M18 8l4 4-4 4"/></svg></button>
+        <button class="vtb" id="eventBtn" title="事件逻辑面板" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></button>
+        <button class="vtb" id="infoPanelBtn" title="关卡信息（传送/任务/音乐）" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></button>
+      </div>
+      <div id="eventPanel" style="display:none">
+        <div class="ev-head">
+          <span class="ev-title">事件逻辑</span>
+          <span class="ev-count" id="evCount">0</span>
+          <span class="spacer"></span>
+          <span class="ev-copy" id="evCopy" title="一键复制全部事件">⧉ 复制</span>
+          <span class="ev-close" id="evClose" title="关闭">✕</span>
+        </div>
+        <input type="text" id="evSearch" class="ev-search" placeholder="🔍 搜索事件名 / 类型...">
+        <div class="ev-list" id="evList"></div>
+      </div>
+      <div id="infoPanel" style="display:none">
+        <div class="ev-head">
+          <span class="ev-title">关卡信息</span>
+          <span class="spacer"></span>
+          <span class="ev-copy" id="ipCopy" title="一键复制全部">⧉ 复制</span>
+          <span class="ev-close" id="ipClose" title="关闭">✕</span>
+        </div>
+        <div class="ev-list" id="ipList"></div>
+      </div>
+      <div id="crosshair"><div class="ring"></div></div>
+      <div id="panpad">
+        <div class="pb empty"></div>
+        <div class="pb" data-pan="forward" title="前进">▲</div>
+        <div class="pb empty"></div>
+        <div class="pb" data-pan="left" title="左移">◀</div>
+        <div class="pb center" data-pan="reset" title="回中">中</div>
+        <div class="pb" data-pan="right" title="右移">▶</div>
+        <div class="pb empty"></div>
+        <div class="pb" data-pan="back" title="后退">▼</div>
+        <div class="pb empty"></div>
+      </div>
+      <div id="toast"></div>
+    </div>
+  </div>
+  <div id="status">
+    <span>顶点 <b id="stVerts">—</b></span>
+    <span>面 <b id="stFaces">—</b></span>
+    <span>版本 <b id="stVer">—</b></span>
+    <span>UV <b id="stUv">—</b></span>
+    <span class="fps">FPS <b id="stFps">—</b></span>
+  </div>
+</div>
+<div id="overlay"><div class="spinner"></div><div class="txt" id="overlayTxt">处理中...</div><div class="bar"><div id="overlayBar"></div></div></div>
+
+<script src="./js/vendor/three.js"></script>
+<script src="./js/src/mesh.js"></script>
+<script src="./js/src/zip.js"></script>
+<script src="./js/src/tex.js"></script>
+<script src="./js/src/dress.js"></script>
+<script src="./js/src/map.js"></script>
+<script src="./js/src/tgcl.js"></script>
+<script src="./js/src/app-core.js"></script>
+<script src="./js/src/three-scene.js"></script>
+<script src="./js/src/export.js"></script>
+<script src="./js/src/materials.js"></script>
+<script src="./js/src/animation.js"></script>
+<script src="./js/src/import.js"></script>
+<script src="./js/src/ui.js"></script>
+<script src="./js/src/events.js"></script>
+</body>
+</html>
