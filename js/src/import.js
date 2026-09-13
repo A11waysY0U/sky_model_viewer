@@ -51,7 +51,7 @@ async function importApk(file) {
       }
     }
     // 加载材质定义（OutfitDefs.json / PlaceableDefs.json），失败不影响主流程
-    outfitDefs = placeableDefs = null; defsLoaded = false;
+    outfitDefs = placeableDefs = dyeColorDefs = null; defsLoaded = false;
     loadMaterialDefs(file, entries).then(() => {
       defsLoaded = true;
       outfitCatalog = buildOutfitCatalog(outfitDefs);

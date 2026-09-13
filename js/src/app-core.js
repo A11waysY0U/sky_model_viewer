@@ -14,7 +14,7 @@ let colorOn = false;
 const TONE_DESAT = 0.08;
 let apkFile = null, meshEntries = [], filtered = [];
 let curBox = null;
-let outfitDefs = null, placeableDefs = null, defsLoaded = false;
+let outfitDefs = null, placeableDefs = null, dyeColorDefs = null, defsLoaded = false;
 let texIndex = null; // 小写贴图名 -> zip entry
 let showTexture = true, currentTexture = null;
 const texCache = new Map();
@@ -182,6 +182,7 @@ const SKY_FS = `
   uniform float uOpacity;
   uniform float uAlphaTest;
   uniform vec3 uBaseHsv;
+  uniform int uHasBaseHsv;
   uniform int uHasColorOverride;
 uniform float uDesaturate;
 uniform int uForceDesat;
@@ -309,7 +310,7 @@ uniform int uForceDesat;
     //   否则（普通染色）：base *= hsvColor
     //   base_hsv=[0,0,100](白) → hsv2rgb=(1,1,1) 即原样显示
     vec3 hsvColor = hsv2rgb(uBaseHsv);
-    if (uHasColorOverride == 1) {
+    if (uHasColorOverride == 1 && uHasBaseHsv == 1) {
       if (alpha < uAlphaTest) discard;
       gl_FragColor = vec4(softClip(toneDesat(hsvColor) * lighting + gSpec), alpha);
       return;
@@ -354,6 +355,9 @@ function skyMaterial(opts) {
       uBaseHsv: { value: Array.isArray(o.baseHsv) && o.baseHsv.length === 3
         ? new THREE.Vector3(o.baseHsv[0], o.baseHsv[1], o.baseHsv[2])
         : new THREE.Vector3(0, 0, 100) },
+      // 保留 base_hsv 是否由材质定义显式提供，导出时避免把缺失值
+      // 误认为默认白色覆盖，从而丢弃原贴图。
+      uHasBaseHsv: { value: Array.isArray(o.baseHsv) && o.baseHsv.length === 3 ? 1 : 0 },
       uHasColorOverride: { value: o.colorOverride ? 1 : 0 },
       uDesaturate: { value: o.desaturate != null ? o.desaturate : 0.0 },
       uForceDesat: { value: 0 },

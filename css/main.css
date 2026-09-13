@@ -50,6 +50,10 @@
   .tbtn.primary { background:linear-gradient(180deg, #34b354, #2ea043); border-color:#3fb950; color:#fff;
     font-weight:600; box-shadow:0 2px 8px rgba(46,160,67,.35); }
   .tbtn.primary:hover { background:linear-gradient(180deg, #3fc061, #34b354); box-shadow:0 3px 12px rgba(46,160,67,.45); }
+  .tbtn.accent { background:linear-gradient(180deg, #4c9aff, #3578d6); border-color:#5ba3ff;
+    color:#fff; font-weight:600; box-shadow:0 2px 8px rgba(76,154,255,.32); }
+  .tbtn.accent:hover { background:linear-gradient(180deg, #62a9ff, #4188e6); border-color:#78b7ff;
+    color:#fff; box-shadow:0 3px 12px rgba(76,154,255,.42); }
   .tbtn:disabled { opacity:.32; cursor:not-allowed; }
   .tbtn:disabled:hover { background:var(--panel2); border-color:var(--line); color:var(--txt); }
   .tbtn .ico { width:15px; height:15px; display:inline-flex; flex:0 0 auto; }
@@ -106,6 +110,20 @@
   #dressActions button:active { transform:translateY(1px) scale(.98); }
   #dressActions button.sec { background:var(--panel2); color:var(--txt); border:1px solid var(--line); box-shadow:none; }
   #dressActions button.sec:hover { background:var(--panel3); border-color:var(--line2); filter:none; }
+
+  /* 衣柜：房间装扮捕获（frida 抓包导入） */
+  #capBox { padding:8px 10px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:6px; }
+  .cap-head { display:flex; align-items:center; gap:6px; }
+  .cap-title { flex:1 1 auto; font-size:11px; color:var(--dim); }
+  .cap-btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:var(--r-sm);
+    padding:4px 9px; font-size:11px; cursor:pointer; transition:all .14s var(--ease); }
+  .cap-btn:hover { background:var(--panel3); border-color:var(--line2); }
+  .cap-chips { display:flex; flex-wrap:wrap; gap:4px; }
+  .cap-chip { background:var(--bg); border:1px solid var(--line); color:var(--dim); padding:3px 9px;
+    border-radius:var(--r-sm); font-size:11px; cursor:pointer; transition:all .14s var(--ease); }
+  .cap-chip:hover { border-color:var(--line2); color:var(--txt); }
+  .cap-chip.active { background:linear-gradient(180deg, var(--accent-hi), var(--accent)); border-color:transparent; color:#fff; }
+  .cap-meta { font-size:10px; color:var(--dim); line-height:1.5; font-variant-numeric:tabular-nums; }
 
   /* 衣柜：顶部槽位分页标签 */
   .dress-tabs { display:flex; flex-wrap:wrap; gap:4px; padding:8px 8px 6px; border-bottom:1px solid var(--line); }

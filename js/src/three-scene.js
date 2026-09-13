@@ -214,6 +214,8 @@ function showMesh(data, keepView) {
   hintEl.style.display = 'none';
   $('objBtn').disabled = false;
   $('glbBtn').disabled = false;
+  if ($('glbFrameBtn')) $('glbFrameBtn').disabled = false;
+  $('mfBtn').disabled = false;
 }
 
 function setView(mode) {

@@ -8,16 +8,48 @@ function stripVariant(meshName) {
   n = n.replace(/_\d+$/, '');
   return n;
 }
+// 国服 OutfitDefs_Netease 里既有额外条目，也有只覆盖 base_hsv 等字段的部分条目。
+// 合并时同名条目做字段级覆盖，避免把通用表的 mesh/type/icon 等基础字段抹掉。
+function mergeOutfitDefs(baseDefs, overlayDefs) {
+  const byName = new Map();
+  if (Array.isArray(baseDefs)) {
+    for (const def of baseDefs) if (def && def.name) byName.set(def.name, def);
+  }
+  if (Array.isArray(overlayDefs)) {
+    for (const def of overlayDefs) {
+      if (!def || !def.name) continue;
+      const prev = byName.get(def.name);
+      byName.set(def.name, prev ? Object.assign({}, prev, def) : def);
+    }
+  }
+  return [...byName.values()];
+}
 async function loadMaterialDefs(file, entries) {
   const find = (base) => entries.find(e => e.name.toLowerCase().endsWith('/' + base) || e.name.toLowerCase().endsWith(base));
   try {
     const oe = find('outfitdefs.json');
-    if (oe) { const raw = await extractEntry(file, oe); outfitDefs = JSON.parse(new TextDecoder().decode(raw)); }
+    if (oe) {
+      const raw = await extractEntry(file, oe);
+      outfitDefs = JSON.parse(new TextDecoder().decode(raw));
+      const ne = find('outfitdefs_netease.json');
+      if (ne) {
+        try {
+          const regionalRaw = await extractEntry(file, ne);
+          const regionalDefs = JSON.parse(new TextDecoder().decode(regionalRaw));
+          outfitDefs = mergeOutfitDefs(outfitDefs, regionalDefs);
+        } catch (e) { /* 国服覆盖表异常时保留通用表 */ }
+      }
+    }
   } catch (e) { outfitDefs = null; }
   try {
     const pe = find('placeabledefs.json');
     if (pe) { const raw = await extractEntry(file, pe); placeableDefs = JSON.parse(new TextDecoder().decode(raw)); }
   } catch (e) { placeableDefs = null; }
+  // DyeColorDefs：染色字节 id → HSV（导入装扮用；缺失不影响主流程）
+  try {
+    const de = find('dyecolordefs.json');
+    if (de) { const raw = await extractEntry(file, de); dyeColorDefs = JSON.parse(new TextDecoder().decode(raw)); }
+  } catch (e) { dyeColorDefs = null; }
   // 建立纹理索引：Images/Bin/ETC2 下的 .ktx，键为小写文件名（不含扩展）
   texIndex = new Map();
   for (const e of entries) {

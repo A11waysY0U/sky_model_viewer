@@ -4,6 +4,15 @@ $('openApkBtn').onclick = () => apkInput.click();
 apkInput.onchange = () => { if (apkInput.files[0]) importApk(apkInput.files[0]); apkInput.value = ''; };
 $('objBtn').onclick = exportOBJ;
 $('glbBtn').onclick = exportGLB;
+let glbFrameBtn = $('glbFrameBtn');
+if (!glbFrameBtn) {
+  glbFrameBtn = document.createElement('button');
+  glbFrameBtn.id = 'glbFrameBtn'; glbFrameBtn.className = 'tbtn';
+  glbFrameBtn.textContent = '导出当前帧'; glbFrameBtn.title = '导出当前动画帧';
+  $('glbBtn').insertAdjacentElement('afterend', glbFrameBtn);
+}
+glbFrameBtn.onclick = exportGLBCurrentFrame;
+$('mfBtn').onclick = export3MF;
 $('wireBtn').onclick = (e) => {
   wireframe = !wireframe;
   e.currentTarget.classList.toggle('active', wireframe);

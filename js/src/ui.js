@@ -49,6 +49,9 @@ function renderDressPanel() {
   }
   panel.appendChild(tabs);
 
+  // ── 装扮导入框（my_outfit.json / frida 抓包；无记录时只有「导入装扮」按钮）──
+  if (typeof renderCaptureBox === 'function') renderCaptureBox(panel);
+
   // ── 当前分类的竖排单行列表：每行左图标 + 右名称，点击即穿 ──
   const slot = DRESS_SLOTS.find(s => s.key === dressActiveSlot);
   const list = outfitCatalog[slot.key] || [];
@@ -60,7 +63,9 @@ function renderDressPanel() {
   const rowEls = [];
   const mkRow = (def, isNone) => {
     const row = document.createElement('div');
-    row.className = 'drow' + ((isNone ? !cur : cur === def) ? ' active' : '');
+    // 选中态按内部 def 对象比对：导入装扮会克隆目录条目挂染色覆盖（hsvOverride），
+    // 克隆件与原条目也要视为同一行选中。
+    row.className = 'drow' + ((isNone ? !cur : !!(cur && cur.def && def.def && cur.def === def.def)) ? ' active' : '');
     row._isNone = isNone; row._def = isNone ? null : def;
     rowEls.push(row);
     const thumb = document.createElement('div');
@@ -90,7 +95,7 @@ function renderDressPanel() {
       dressSelection[slot.key] = isNone ? null : def;
       // 只更新行高亮，不重建整个面板——否则列表会被清空重建、滚动位置弹回顶部且图标重新解码
       const sel = dressSelection[slot.key];
-      for (const r of rowEls) r.classList.toggle('active', r._isNone ? !sel : r._def === sel);
+      for (const r of rowEls) r.classList.toggle('active', r._isNone ? !sel : !!(sel && r._def && sel.def === r._def.def));
       // 同步顶部该分类标签的「已选」标记
       const tabEl = tabByKey[slot.key];
       if (tabEl) tabEl.classList.toggle('has', !!sel);
@@ -536,7 +541,7 @@ async function loadMapLevel(entry) {
     setupEventPanel();
     // 关卡信息面板：有传送/任务/音乐等才显示入口
     setupInfoPanel();
-    $('objBtn').disabled = false; $('glbBtn').disabled = false;
+    $('objBtn').disabled = false; $('glbBtn').disabled = false; if ($('glbFrameBtn')) $('glbFrameBtn').disabled = false; $('mfBtn').disabled = false;
     overlayBar.style.width = '100%';
     toast(`${levelNameOf(entry)}：地形 ${(d.indexCount/3)|0} 面 + 物件 ${placed}`);
     if (isMobile()) setCollapsed(true);

@@ -203,7 +203,10 @@ async function loadAnimation(entry, index, silent, staticPose) {
       for (let k = 0; k < m.length; k++) { totalBones++; if (m[k] >= 0) mapped++; }
     }
     const hitRate = totalBones ? mapped / totalBones : 0;
-    if (animState.skinnedParts.length && hitRate < 0.5) {
+    // Partial name matches are unsafe for skinning: a mismatched animation
+    // can still reach 50% while sending the remaining vertices far away.
+    // Require near-complete compatibility before applying any matrices.
+    if (animState.skinnedParts.length && hitRate < 0.9) {
       animState.pack = null; animState.decoded = null;
       animState.curIndex = -1; animState.playing = false;
       updateAnimUI();
@@ -242,6 +245,14 @@ async function loadDressCharacter() {
   const myToken = ++loadToken;
   clearScene();
   dressGroup = new THREE.Group();
+  // 导入装扮的体型近似（body.scale=横向比例、body.height=高矮）。
+  // height 按每单位 5% 估、scale 按比例分数直用；在组成部件前设置，包围盒/取景自动含缩放。
+  if (typeof activeCaptureIdx === 'number' && activeCaptureIdx >= 0 && importedCaptures[activeCaptureIdx]) {
+    const b = importedCaptures[activeCaptureIdx].body || {};
+    const sxz = Math.min(1.25, Math.max(0.8, 1 + (b.scale || 0)));
+    const sy = Math.min(1.25, Math.max(0.8, 1 + (b.height || 0) * 0.05));
+    dressGroup.scale.set(sxz, sy, sxz);
+  }
   let loaded = 0, total = 0;
   const box = new THREE.Box3();
   const skinned = [];
@@ -258,18 +269,27 @@ async function loadDressCharacter() {
       const geo = buildGeometry(data);
       // 有骨骼权重 + 内嵌骨架的部件走 GPU 蒙皮（道具若自带骨架，播放动画时会自行挂到背后）
       const canSkin = !!(data.boneIndices && data.skeletonBones && data.skeletonBones.length);
-      const mat = await buildPartMaterial(sel.def, canSkin, canSkin ? data.skeletonBones.length : 0);
+      // 导入装扮的染色：数字/命名 dye 经 DyeColorDefs 转 HSV，覆盖 def 默认染色
+      const defForMat = sel.hsvOverride ? Object.assign({}, sel.def, { base_hsv: sel.hsvOverride }) : sel.def;
+      const mat = await buildPartMaterial(defForMat, canSkin, canSkin ? data.skeletonBones.length : 0);
       if (myToken !== loadToken) { geo.dispose(); if (mat && mat.dispose) mat.dispose(); return; }
       const mesh = new THREE.Mesh(geo, mat);
       mesh.name = slot.key;
+      // Keep the embedded bind-pose skeleton available to the GLB exporter.
+      // Preview rendering uses a custom bone texture, while glTF needs the
+      // original bone records to emit a standard skin.
+      if (data.skeletonBones) mesh.userData.skeletonBones = data.skeletonBones;
       mesh.frustumCulled = false; // 蒙皮后包围盒会变，关闭裁剪避免误剔除
       dressGroup.add(mesh);
-      box.expandByObject(mesh);
       if (canSkin) skinned.push({ mesh, geo, mat, skeletonBones: data.skeletonBones, boneToAnim: null });
       loaded++;
     } catch (e) { console.error('部件加载失败', slot.key, e); }
   }
   if (myToken !== loadToken) { disposeObject3D(dressGroup); dressGroup = null; return; }
+  // dressGroup.scale 是导入装扮的体型近似；必须更新完子节点矩阵后再取包围盒，
+  // 否则 expandByObject 读取到尚未刷新的父矩阵，取景会忽略缩放。
+  dressGroup.updateMatrixWorld(true);
+  box.setFromObject(dressGroup);
   scene.add(dressGroup);
   currentMesh = dressGroup; currentData = null;
   curBox = box.isEmpty() ? new THREE.Box3(new THREE.Vector3(-1,-1,-1), new THREE.Vector3(1,1,1)) : box;

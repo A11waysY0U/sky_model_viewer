@@ -14,6 +14,7 @@
     <div class="sep"></div>
     <button class="tbtn" id="objBtn" disabled><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg></span><span class="full">导出 OBJ</span><span class="short">OBJ</span></button>
     <button class="tbtn" id="glbBtn" disabled><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg></span><span class="full">导出 GLB</span><span class="short">GLB</span></button>
+    <button class="tbtn accent" id="mfBtn" disabled onclick="if (typeof export3MF === 'function') export3MF(); else alert('3MF 导出模块未加载，请按 Ctrl+F5 强制刷新');"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg></span><span class="full">导出 3MF</span><span class="short">3MF</span></button>
     <div class="sep"></div>
     <button class="tbtn" id="dressBtn" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a2 2 0 0 0-2 2c0 .8.5 1.5 1 2L5 11v3h3v6h8v-6h3v-3l-6-4c.5-.5 1-1.2 1-2a2 2 0 0 0-2-2z"/></svg></span><span class="full">衣柜</span><span class="short">衣柜</span></button>
     <button class="tbtn" id="mapBtn" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><span class="full">地图</span><span class="short">地图</span></button>
@@ -96,15 +97,17 @@
 <script src="./js/src/zip.js"></script>
 <script src="./js/src/tex.js"></script>
 <script src="./js/src/dress.js"></script>
+<script src="./js/src/outfit-import.js"></script>
 <script src="./js/src/map.js"></script>
 <script src="./js/src/tgcl.js"></script>
-<script src="./js/src/app-core.js"></script>
+<script src="./js/src/app-core.js?v=20260913a"></script>
 <script src="./js/src/three-scene.js"></script>
-<script src="./js/src/export.js"></script>
+<script src="./js/src/export.js?v=20260913b"></script>
+<script src="./js/src/export3mf.js?v=20260913a"></script>
 <script src="./js/src/materials.js"></script>
 <script src="./js/src/animation.js"></script>
 <script src="./js/src/import.js"></script>
 <script src="./js/src/ui.js"></script>
-<script src="./js/src/events.js"></script>
+<script src="./js/src/events.js?v=20260912c"></script>
 </body>
 </html>
